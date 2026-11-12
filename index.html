@@ -757,12 +757,13 @@
     100% { transform: translate(var(--cx), var(--cy)) rotate(var(--cr)); opacity: 0; }
   }
   .screen-shake { animation: screen-shake-kf 0.4s ease-in-out; }
+  /* uses the separate 'translate' property so it never overrides a board's own rotate(180deg) (Black's view) */
   @keyframes screen-shake-kf {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-6px); }
-    40% { transform: translateX(5px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(3px); }
+    0%, 100% { translate: 0 0; }
+    20% { translate: -6px 0; }
+    40% { translate: 5px 0; }
+    60% { translate: -4px 0; }
+    80% { translate: 3px 0; }
   }
 
   /* Broadcast-style "big moment" callout -- see matchMoment(). Shared by
@@ -2042,6 +2043,30 @@
   .ws-stream { position: absolute; width: 7px; border-radius: 4px; transform-origin: top center; z-index: 5; pointer-events: none; animation: ws-pour .55s ease-in both; box-shadow: 0 0 6px rgba(255,255,255,.4); }
   @keyframes ws-pour { from { transform: scaleY(0); } to { transform: scaleY(1); } }
   .ws-msg { min-height: 24px; text-align: center; color: var(--brass-light); margin: 2px 0 8px; }
+  /* ---- Othello ---- */
+  .oth-wrap { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; direction: ltr; }
+  .oth-main { flex: 1 1 320px; max-width: 520px; }
+  .oth-score-row { display: flex; gap: 18px; justify-content: space-between; margin-bottom: 10px; direction: ltr; }
+  .oth-score { display: flex; align-items: center; gap: 10px; padding: 6px 12px; border: 1px solid var(--brass); border-radius: 6px; flex: 1; font-size: 13px; color: var(--cream-dim); }
+  .oth-score b { font-size: 22px; color: var(--cream); min-width: 28px; }
+  .oth-score.turn { box-shadow: 0 0 0 2px var(--brass-light); }
+  .oth-score .oth-disc { position: static; width: 22px; height: 22px; flex: none; }
+  .oth-board { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); width: min(480px, 94vw); aspect-ratio: 1; background: #0f4d31; border: 4px solid var(--wood); border-radius: 6px; gap: 2px; padding: 2px; direction: ltr; touch-action: manipulation; }
+  .oth-cell { position: relative; display: block; padding: 0; margin: 0; background: #1d7a4b; border: 0; border-radius: 2px; cursor: pointer; min-width: 0; min-height: 0; }
+  .oth-cell:hover.legal { background: #26905a; }
+  .oth-cell.last { box-shadow: inset 0 0 0 2px var(--brass-light); }
+  .oth-cell.hint { animation: oth-pulse 0.7s ease-in-out 3; }
+  @keyframes oth-pulse { 50% { background: #d9b36c; } }
+  .oth-disc { position: absolute; inset: 10%; border-radius: 50%; box-shadow: 0 2px 3px rgba(0,0,0,.45); }
+  .oth-disc.b { background: radial-gradient(circle at 35% 30%, #4a4a4a, #0c0c0c 70%); }
+  .oth-disc.w { background: radial-gradient(circle at 35% 30%, #ffffff, #cfcfcf 75%); }
+  .oth-disc.flip { animation: oth-flip 0.4s ease-in-out; }
+  @keyframes oth-flip { 0% { transform: rotateY(90deg) scale(0.9); } 100% { transform: rotateY(0) scale(1); } }
+  .oth-dot { position: absolute; left: 38%; top: 38%; width: 24%; height: 24%; border-radius: 50%; background: rgba(255,255,255,.35); pointer-events: none; }
+  .oth-msg { min-height: 3em; margin-top: 10px; color: var(--cream); font-size: 15px; }
+  .oth-opts { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 14px; align-items: center; }
+  .oth-opts .lbl { font-size: 13px; color: var(--cream-dim); margin-inline-end: 4px; }
+  body.cb-on .oth-disc.w { outline: 3px solid #888; }
   .bc-wrap { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; }
   .bc-grid {
     display: grid;
@@ -2191,7 +2216,7 @@
   <div class="topbar">
     <h1 id="homeLink">The Parlour</h1>
     <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
-      <div class="tagline">A table of twenty-seven games, all dealt out and ready to play.</div>
+      <div class="tagline">A table of twenty-eight games, all dealt out and ready to play.</div>
     </div>
   </div>
   <div class="game-bar">
@@ -2313,6 +2338,7 @@ const GAMES = [
   {id:'chesslessons', name:'Chess Lessons', status:'Fully playable', notes:'Your chess record across every rule set, with the lesson library underneath', playable:true, category:'strategy'},
   {id:'checkers', name:'Checkers', status:'Playable + AI', notes:'16 regional rule sets, 10 AI levels, 2-player mode, Helper, 7 themes, 2D/3D view, auto-save', playable:true, category:'strategy',
     variants:['American Checkers','English Draughts','Brazilian Checkers','Canadian Checkers','Chinese Checkers','Bashni','Czech Checkers','Dameo','Ghanaian Checkers','Damii','International Checkers','Polish Checkers','Italian Checkers','Malaysian Checkers','Singaporean Checkers','Pool Checkers','Russian Checkers','Nigerian Checkers','Nigerian Draughts','Spanish Checkers','Thai Checkers','Makhos','Turkish Checkers']},
+  {id:'othello', name:'Othello', status:'Playable + AI', notes:'Classic Reversi \u2014 trap and flip your opponent\u2019s discs, 5 AI levels, 2-player mode, hint and undo', playable:true, category:'strategy'},
   {id:'snakesladders', name:'Snakes and Ladders', status:'Fully playable', notes:'Roll dice, climb ladders, dodge snakes, race to 100', playable:true, category:'dice'},
   {id:'backgammon', name:'Backgammon', status:'Playable + AI', notes:'Dice, bar, bearing off, doubling cube, gammons, resign, pip count, simple AI', playable:true, category:'dice'},
   {id:'ludo', name:'Ludo', status:'Fully playable', notes:'Classic 4-player race \u2014 roll, move, capture, get all 4 tokens home', playable:true, category:'dice'},
@@ -2397,6 +2423,7 @@ const GAME_ACCENTS = {
   billiards:      '#4CAE7A',
   watersort:      '#18B6B0',
   blockclear:     '#9B6BC9',
+  othello:        '#4CAE7A',
   monopoly:       '#4CAE7A',
   munch:          '#D9B36C',
   darts:          '#D9574A',
@@ -3544,7 +3571,7 @@ let APP_LANG = (function () { const l = safeGet('app-lang', 'en'); return (l ===
 function isRtlLang() { return APP_LANG === 'fa' || APP_LANG === 'azb'; }
 const FA = {
   // hub
-  'A table of twenty-seven games, all dealt out and ready to play.': 'میزی با بیست‌وهفت بازی، چیده و آمادهٔ بازی.',
+  'A table of twenty-eight games, all dealt out and ready to play.': 'میزی با بیست‌وهشت بازی، چیده و آمادهٔ بازی.',
   'Search games...': 'جستجوی بازی‌ها...',
   'Your scores live only in this browser, on this device.': 'امتیازهای شما فقط در همین مرورگر و روی همین دستگاه ذخیره می‌شوند.',
   '← Back to the table': '→ بازگشت به میز',
@@ -3881,7 +3908,7 @@ const FA = {
   "First player to land exactly on square 100 wins.": "اولین بازیکنی که دقیقاً روی خانهٔ ١٠٠ بایستد برنده است.",
   "Home": "خانه",
   "Roll Dice": "ریختن تاس",
-  "New game": "بازی جدید",
+  "New game": "بازی تازه",
   "Winning after your opponent has borne off at least one checker is a single win. Winning before they've borne off any is a gammon (2x). Winning before they've borne off any and they still have a checker in your home board or on the bar is a backgammon (3x).": "برنده شدن پس از آنکه حریف دست‌کم یک مهره را بیرون برده، برد ساده است. برنده شدن پیش از آنکه حریف هیچ مهره‌ای بیرون ببرد، گمون (٢ برابر) است. برنده شدن پیش از آنکه حریف هیچ مهره‌ای بیرون ببرد، در حالی که هنوز مهره‌ای در خانهٔ شما یا روی بار دارد، بک‌گمون (٣ برابر) است.",
   "Classic backgammon with an opening roll, doubling cube, and gammon scoring.": "تخته‌نردِ کلاسیک با تاس آغازین، مکعب دوبله و امتیازدهی گمون.",
   "Each game opens with both players rolling one die; the higher roll goes first, playing those two numbers as the opening move.": "هر بازی با ریختن یک تاس توسط هر دو بازیکن آغاز می‌شود؛ تاس بالاتر شروع می‌کند و همان دو عدد را به‌عنوان حرکت اول بازی می‌کند.",
@@ -4041,7 +4068,7 @@ const FA = {
   "Clear every tile to win. Every board is dealt so that it can be cleared, but a wrong early choice can still leave you stuck.": "همهٔ کاشی‌ها را پاک کنید تا ببرید. هر صفحه طوری چیده می‌شود که قابل پاک شدن باشد، اما انتخاب اشتباه در ابتدا همچنان می‌تواند شما را گیر بیندازد.",
   "Use": "از",
   "to see a matching pair,": "برای دیدن یک جفت مطابق،",
-  "Undo": "واگرد",
+  "Undo": "برگشت",
   "to take back a move, and": "برای پس گرفتن یک حرکت، و",
   "to re-deal the tiles that are left when you are stuck.": "برای دوباره چیدن کاشی‌های باقی‌مانده وقتی گیر کرده‌اید، استفاده کنید.",
   "Turtle (144)": "لاک‌پشت (١٤٤)",
@@ -4688,6 +4715,38 @@ const FA = {
   "The four outer grids each share one 3×3 box with the center grid, so those shared cells have to satisfy both grids at once.": "هر یک از چهار شبکهٔ بیرونی یک خانهٔ ٣×٣ را با شبکهٔ مرکزی شریک است، پس آن خانه‌های مشترک باید هم‌زمان هر دو شبکه را برآورده کنند.",
   "to flag mistakes across all five grids, or": "تا اشتباه‌ها در هر پنج شبکه نشان داده شوند، یا",
   "to reveal one correct cell. Every cell is checked the instant you fill it in.": "تا یک خانهٔ درست آشکار شود. هر خانه همان لحظه که پر می‌کنید بررسی می‌شود.",
+  "Othello": "اتللو",
+  "Flip the other side's discs by trapping them between yours. Most discs when the board fills wins.": "مهره‌های حریف را با محاصره کردن بین مهره‌های خودتان برگردانید. وقتی صفحه پر شد، کسی که مهره‌های بیشتری دارد برنده است.",
+  "Othello (also called Reversi) is a two-player game of capture by surrounding, played on an 8×8 board.": "اتللو (که ریورسی هم نامیده می‌شود) بازی دونفره‌ای است که روی صفحهٔ ٨×٨ با محاصره کردن مهره‌های حریف انجام می‌شود.",
+  "Black moves first. On your turn, place one disc on an empty square so that it traps a straight line of the other side's discs between your new disc and another of your discs.": "سیاه اول حرکت می‌کند. در نوبت خود یک مهره روی یک خانهٔ خالی بگذارید، طوری که یک خط مستقیم از مهره‌های حریف بین مهرهٔ تازه و یکی دیگر از مهره‌های شما محاصره شود.",
+  "Every trapped disc, in any of the eight directions, flips to your colour.": "هر مهرهٔ محاصره‌شده، در هر یک از هشت جهت، به رنگ شما برمی‌گردد.",
+  "You must play a move that flips at least one disc. Small dots show your legal moves.": "باید حرکتی بزنید که دست‌کم یک مهره را برگرداند. نقطه‌های کوچک حرکت‌های مجاز شما را نشان می‌دهند.",
+  "If you have no legal move, you pass and the other side plays again. If neither side can move, the game ends.": "اگر حرکت مجازی ندارید، پاس می‌دهید و حریف دوباره بازی می‌کند. اگر هیچ‌یک نتوانند حرکت کنند، بازی تمام می‌شود.",
+  "The side with more discs at the end wins. Equal discs is a draw.": "در پایان، طرفی که مهره‌های بیشتری دارد برنده است. اگر برابر باشند، بازی مساوی است.",
+  "Corners can never be flipped — take them whenever you safely can.": "گوشه‌ها هرگز برنمی‌گردند — هر وقت با امنیت می‌توانید، آن‌ها را بگیرید.",
+  "Try not to take the squares next to an empty corner; they hand the corner to your opponent.": "سعی کنید خانه‌های کنار یک گوشهٔ خالی را نگیرید؛ آن‌ها گوشه را به حریف می‌دهند.",
+  "Fewer discs early is often better: keeping your opponent’s moves limited matters more than a big lead.": "در ابتدا مهرهٔ کمتر اغلب بهتر است: محدود نگه داشتن حرکت‌های حریف از پیشتازی زیاد مهم‌تر است.",
+  "Look for moves that leave your opponent with only bad squares to choose from.": "دنبال حرکت‌هایی بگردید که حریف را فقط با خانه‌های بد رها کنند.",
+  "Mode:": "حالت:",
+  "Level:": "سطح:",
+  "Show legal moves:": "نمایش حرکت‌های مجاز:",
+  "vs Computer": "در برابر رایانه",
+  "Two players": "دو بازیکن",
+  "Expert": "خبره",
+  "On": "روشن",
+  "Othello board": "صفحهٔ اتللو",
+  "Hint": "راهنما",
+  "Your move — you are Black.": "نوبت شماست — شما سیاه هستید.",
+  "That move flips nothing — pick a square with a dot.": "این حرکت چیزی را برنمی‌گرداند — خانه‌ای با نقطه انتخاب کنید.",
+  "You have no legal move — you pass.": "حرکت مجازی ندارید — پاس می‌دهید.",
+  "Computer has no legal move — it passes.": "رایانه حرکت مجازی ندارد — پاس می‌دهد.",
+  "Black has no legal move — passes.": "سیاه حرکت مجازی ندارد — پاس می‌دهد.",
+  "White has no legal move — passes.": "سفید حرکت مجازی ندارد — پاس می‌دهد.",
+  "Try the pulsing square.": "خانهٔ چشمک‌زن را امتحان کنید.",
+  "black disc": "مهرهٔ سیاه",
+  "white disc": "مهرهٔ سفید",
+  "empty, legal move": "خالی، حرکت مجاز",
+  "Classic Reversi — trap and flip your opponent’s discs, 5 AI levels, 2-player mode, hint and undo": "ریورسی کلاسیک — مهره‌های حریف را محاصره و برگردانید، ٥ سطح رایانه، حالت دونفره، راهنما و برگشت",
   "Lakeside Cottage": "کلبهٔ کنار دریاچه",
   "Sunburst & Suits": "پرتو خورشید و خال‌ها",
   "Card Fan": "بادبزن کارت",
@@ -4756,7 +4815,6 @@ const FA = {
   "Club+": "باشگاهی+",
   "Strong": "قوی",
   "Strong+": "قوی+",
-  "Expert": "خبره",
   "AIoff": "رایانه خارج",
   "Youroff": "شما خارج",
   "South": "جنوب",
@@ -4784,6 +4842,7 @@ const FA_NOTES = {
   chess: 'شطرنج استاندارد، به‌همراه شطرنج تیمورلنگ (کامل و ساده) و شطرنج دوتایی',
   gemstats: 'موجودی جواهر، درآمد و منبع آن‌ها',
   chesslessons: 'برد، باخت و مساوی‌های شما در همهٔ قوانین شطرنج، با کتابخانهٔ آموزش در پایین',
+  othello: 'ریورسی کلاسیک — مهره‌های حریف را محاصره و برگردانید، ٥ سطح رایانه، حالت دونفره، راهنما و برگشت',
   checkers: '١٦ مجموعه قانون منطقه‌ای، ١٠ سطح هوش مصنوعی، حالت دو نفره، راهنما، ٧ تم، نمای دوبعدی/سه‌بعدی، ذخیرهٔ خودکار',
   snakesladders: 'تاس بریزید، از نردبان بالا بروید، از مارها دور بمانید و به خانهٔ ١٠٠ برسید',
   backgammon: 'تاس، میله، بیرون بردن مهره‌ها، تاس دوبل، گمون، تسلیم، شمارش پیپ، هوش مصنوعی ساده',
@@ -4811,7 +4870,7 @@ const FA_NOTES = {
 };
 // Iranian Azerbaijani (South Azerbaijani, Perso-Arabic script) -- first draft, to be proofread by a native speaker.
 const AZB = {
-  'A table of twenty-seven games, all dealt out and ready to play.': 'یئگیرمی‌یئددی اویونلا دولو بیر ماسا، حاضیر و اوینامایا آماده.',
+  'A table of twenty-eight games, all dealt out and ready to play.': 'یئگیرمی‌سکگیز اویونلا دولو بیر ماسا، حاضیر و اوینامایا آماده.',
   'Search games...': 'اویونلاری آختار...',
   'Your scores live only in this browser, on this device.': 'نتیجه‌لریز یالنیز بو بروزرده و بو دستگاهدا ساخلانیر.',
   '← Back to the table': '→ ماسایا قاییت',
@@ -4875,7 +4934,7 @@ const FA_PATTERNS = [
   [/^Resume (.+) where you left off\?$/, (m, pd) => 'بازی «' + tr(m[1]) + '» از جایی که رها کردید ادامه یابد؟'],
   [/^Point (\d+), empty$/, (m, pd) => 'خانهٔ ' + pd(m[1]) + '، خالی'],
   [/^Point (\d+), (\d+) (your|AI) checkers?$/, (m, pd) => 'خانهٔ ' + pd(m[1]) + '، ' + pd(m[2]) + ' مهرهٔ ' + (m[3] === 'AI' ? 'رایانه' : 'شما')],
-  [/^Row (\d+), column (\d+), (.+)$/, (m, pd) => 'ردیف ' + pd(m[1]) + '، ستون ' + pd(m[2]) + '، ' + (m[3] === 'empty' ? 'خالی' : m[3])],
+  [/^Row (\d+), column (\d+), (.+)$/, (m, pd) => 'ردیف ' + pd(m[1]) + '، ستون ' + pd(m[2]) + '، ' + (m[3] === 'empty' ? 'خالی' : tr(m[3]))],
   [/^Row (\d+), column (\d+)$/, (m, pd) => 'ردیف ' + pd(m[1]) + '، ستون ' + pd(m[2])],
   [/^(red|green|blue|yellow) token$/, (m) => 'مهرهٔ ' + ({ red: 'قرمز', green: 'سبز', blue: 'آبی', yellow: 'زرد' })[m[1]]],
   [/^(Your|AI) token$/, (m) => m[1] === 'AI' ? 'مهرهٔ رایانه' : 'مهرهٔ شما'],
@@ -4978,6 +5037,8 @@ const FA_PATTERNS = [
     const pn = n => PN[n.toLowerCase()] || n;
     const cl = c => { let x; if ((x = /^capture the (.+)$/.exec(c))) return pn(x[1]) + ' را بگیرید'; if (/^castle/.test(c)) return 'قلعه‌گیری کنید تا شاه امن شود'; if (/^promote/.test(c)) return 'پیاده را ارتقا دهید'; if (/^check the opponent/.test(c)) return 'شاه حریف را کیش کنید'; if (/^move toward the center/.test(c)) return 'به‌سمت مرکز بروید تا گزینه‌های بیشتری داشته باشید'; if (/^reposition|^improve/.test(c)) return 'به خانه‌ای فعال‌تر بروید'; return c; };
     return 'سعی کنید ' + pn(m[1]) + ' خود را از ' + m[2] + ' به ' + m[3] + ' ببرید — با این کار می‌توانید ' + m[4].split(', and ').map(cl).join(' و ') + '.'; }],
+  [/^(You win|Computer wins|Black wins|White wins|Draw) (\d+)[–-](\d+)([!.])$/, (m, pd) => ({ 'You win': 'شما بردید', 'Computer wins': 'رایانه برد', 'Black wins': 'سیاه برد', 'White wins': 'سفید برد', 'Draw': 'مساوی' })[m[1]] + ' ' + pd(m[2]) + '–' + pd(m[3]) + (m[4] === '!' ? '!' : '.')],
+  // ---- end dynamic ----
   // ---- end dynamic ----
   // ---- end dynamic ----
   // ---- end dynamic ----
@@ -5331,6 +5392,7 @@ const RENDER_FNS = {
   munch: renderMunch,
   ludo: renderLudo,
   blockclear: renderBlockClear,
+  othello: renderOthello,
   mahjong: renderMahjong,
   jenga: renderJenga,
   billiards: renderBilliards,
@@ -16881,6 +16943,7 @@ const SCORE_SOURCES = [
   { name: 'Darts', key: 'dt-stats', fields: [{k:'wins',label:'Wins'},{k:'losses',label:'Losses'}] },
   { name: 'Snake Arena', key: 'sn-stats', fields: [{k:'best',label:'Best length'},{k:'wins',label:'Rounds won'},{k:'kills',label:'Snakes trapped'}] },
   { name: 'Water Sort', key: 'ws-stats', fields: [{k:'levels',label:'Levels cleared'},{k:'best',label:'Highest level'}] },
+  { name: 'Othello', key: 'oth-stats', fields: [{k:'wins',label:'Wins'},{k:'losses',label:'Losses'}] },
   { name: 'Block Clear', key: 'bc-stats', fields: [{k:'best',label:'Best score'}] },
   { name: 'Mahjong Solitaire', key: 'mj-stats', fields: [{k:'solved',label:'Boards cleared'},{k:'bestTimeMs',label:'Best time',format:formatScoreClock}] },
   { name: 'Jigsaw', key: 'jig-stats', fields: [{k:'solved',label:'Solved'},{k:'bestTimeMs',label:'Best time',format:formatScoreClock}] },
@@ -18648,6 +18711,269 @@ function wsFinish() {
   const nx = document.getElementById('wsNext'); if (nx) nx.style.display = '';
   const rack = document.getElementById('wsRack'); if (rack) celebrateWin(rack);
   const c = document.getElementById('wsClearedDisp'); if (c) c.textContent = wsStats.levels;
+}
+
+/* ---------------- OTHELLO (Reversi) ---------------- */
+const OTH_N = 8;
+const OTH_DIRS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+const OTH_W = [
+  [100,-20,10, 5, 5,10,-20,100],
+  [-20,-50,-2,-2,-2,-2,-50,-20],
+  [ 10, -2, 1, 1, 1, 1, -2, 10],
+  [  5, -2, 1, 0, 0, 1, -2,  5],
+  [  5, -2, 1, 0, 0, 1, -2,  5],
+  [ 10, -2, 1, 1, 1, 1, -2, 10],
+  [-20,-50,-2,-2,-2,-2,-50,-20],
+  [100,-20,10, 5, 5,10,-20,100]];
+const OTH_LEVELS = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
+let othB = null, othTurn = 1, othOver = false, othBusy = false, othLast = null, othHist = [], othToken = 0;
+let othMode = safeGet('oth-mode', '1p'), othLevel = safeGet('oth-level', 3), othShowMoves = safeGet('oth-show', true);
+let othStats = safeGet('oth-stats', {wins:0, losses:0, draws:0});
+if (othMode !== '1p' && othMode !== '2p') othMode = '1p';
+if (!(othLevel >= 1 && othLevel <= 5)) othLevel = 3;
+
+function othNewBoard() {
+  const b = Array.from({length: OTH_N}, () => Array(OTH_N).fill(0));
+  b[3][3] = -1; b[4][4] = -1; b[3][4] = 1; b[4][3] = 1;
+  return b;
+}
+function othCopy(b) { return b.map(r => r.slice()); }
+function othFlips(b, r, c, p) {
+  if (b[r][c] !== 0) return [];
+  const out = [];
+  for (const [dr, dc] of OTH_DIRS) {
+    let rr = r + dr, cc = c + dc; const line = [];
+    while (rr >= 0 && rr < OTH_N && cc >= 0 && cc < OTH_N && b[rr][cc] === -p) { line.push([rr, cc]); rr += dr; cc += dc; }
+    if (line.length && rr >= 0 && rr < OTH_N && cc >= 0 && cc < OTH_N && b[rr][cc] === p) out.push(...line);
+  }
+  return out;
+}
+function othMoves(b, p) {
+  const m = [];
+  for (let r = 0; r < OTH_N; r++) for (let c = 0; c < OTH_N; c++) {
+    const f = othFlips(b, r, c, p);
+    if (f.length) m.push({r, c, f});
+  }
+  return m;
+}
+function othApply(b, mv, p) { b[mv.r][mv.c] = p; mv.f.forEach(([r, c]) => { b[r][c] = p; }); }
+function othCount(b) { let k = 0, w = 0; b.forEach(row => row.forEach(v => { if (v === 1) k++; else if (v === -1) w++; })); return {b: k, w}; }
+function othEval(b, p) {
+  let s = 0, n = 0;
+  for (let r = 0; r < OTH_N; r++) for (let c = 0; c < OTH_N; c++) { const v = b[r][c]; if (v) { s += v * p * OTH_W[r][c]; n++; } }
+  s += 6 * (othMoves(b, p).length - othMoves(b, -p).length);
+  if (n > 52) { const k = othCount(b); s += 12 * (p === 1 ? k.b - k.w : k.w - k.b); }
+  return s;
+}
+function othNegamax(b, p, depth, alpha, beta) {
+  const mv = othMoves(b, p);
+  if (!mv.length) {
+    if (!othMoves(b, -p).length) { const k = othCount(b); const d = (p === 1 ? k.b - k.w : k.w - k.b); return d * 1000; }
+    return -othNegamax(b, -p, depth - 1, -beta, -alpha);
+  }
+  if (depth <= 0) return othEval(b, p);
+  mv.sort((a, z) => OTH_W[z.r][z.c] - OTH_W[a.r][a.c]);
+  let best = -Infinity;
+  for (const m of mv) {
+    const nb = othCopy(b); othApply(nb, m, p);
+    const v = -othNegamax(nb, -p, depth - 1, -beta, -alpha);
+    if (v > best) best = v;
+    if (best > alpha) alpha = best;
+    if (alpha >= beta) break;
+  }
+  return best;
+}
+function othAiPick(b, p, level) {
+  const mv = othMoves(b, p); if (!mv.length) return null;
+  if (level <= 1) return mv[Math.floor(Math.random() * mv.length)];
+  if (level === 2) { const mx = Math.max(...mv.map(m => m.f.length)); const t = mv.filter(m => m.f.length === mx); return t[Math.floor(Math.random() * t.length)]; }
+  if (level === 3) { const mx = Math.max(...mv.map(m => OTH_W[m.r][m.c])); const t = mv.filter(m => OTH_W[m.r][m.c] === mx); return t[Math.floor(Math.random() * t.length)]; }
+  const depth = level === 4 ? 3 : 5;
+  let best = null, bv = -Infinity;
+  mv.sort((a, z) => OTH_W[z.r][z.c] - OTH_W[a.r][a.c]);
+  for (const m of mv) {
+    const nb = othCopy(b); othApply(nb, m, p);
+    const v = -othNegamax(nb, -p, depth - 1, -Infinity, Infinity) + Math.random() * 0.01;
+    if (v > bv) { bv = v; best = m; }
+  }
+  return best;
+}
+
+function othHumanTurn() { return othMode === '2p' || othTurn === 1; }
+function othSideName(p) { return p === 1 ? 'Black' : 'White'; }
+function othSetMsg(t) { const e = document.getElementById('othMsg'); if (e) e.textContent = t; }
+function othTurnMsg() {
+  if (othOver) return;
+  if (othMode === '2p') othSetMsg(othTurn === 1 ? "Black's move." : "White's move.");
+  else othSetMsg(othTurn === 1 ? 'Your move — you are Black.' : 'Computer is thinking…');
+}
+
+function renderOthello(resume) {
+  othToken++;
+  if (!resume || !othB) {
+    othB = othNewBoard(); othTurn = 1; othOver = false; othBusy = false; othLast = null; othHist = [];
+    startTimer();
+  }
+  const modeBtn = (m, label) => `<button class="mode-btn ${othMode === m ? 'on' : ''}" type="button" data-m="${m}" aria-pressed="${othMode === m}">${label}</button>`;
+  const lvlBtns = OTH_LEVELS.map((n, i) => `<button class="mode-btn ${othLevel === i + 1 ? 'on' : ''}" type="button" data-l="${i + 1}" aria-pressed="${othLevel === i + 1}">${n}</button>`).join('');
+  view.innerHTML = `
+    <h2 class="game-title">Othello</h2>
+    <p class="game-sub">Flip the other side's discs by trapping them between yours. Most discs when the board fills wins.</p>
+    ${aboutBlock(`
+      <p>Othello (also called Reversi) is a two-player game of capture by surrounding, played on an 8&times;8 board.</p>
+      <ul>
+        <li>Black moves first. On your turn, place one disc on an empty square so that it traps a straight line of the other side's discs between your new disc and another of your discs.</li>
+        <li>Every trapped disc, in any of the eight directions, flips to your colour.</li>
+        <li>You must play a move that flips at least one disc. Small dots show your legal moves.</li>
+        <li>If you have no legal move, you pass and the other side plays again. If neither side can move, the game ends.</li>
+        <li>The side with more discs at the end wins. Equal discs is a draw.</li>
+      </ul>
+    `)}
+    ${coachBlock([
+      'Corners can never be flipped — take them whenever you safely can.',
+      'Try not to take the squares next to an empty corner; they hand the corner to your opponent.',
+      'Fewer discs early is often better: keeping your opponent’s moves limited matters more than a big lead.',
+      'Look for moves that leave your opponent with only bad squares to choose from.'
+    ])}
+    <div class="oth-opts"><span class="lbl">Mode:</span>${modeBtn('1p', 'vs Computer')}${modeBtn('2p', 'Two players')}</div>
+    <div class="oth-opts" id="othLevelRow"${othMode === '2p' ? ' hidden' : ''}><span class="lbl">Level:</span>${lvlBtns}</div>
+    <div class="oth-opts"><span class="lbl">Show legal moves:</span><button class="mode-btn ${othShowMoves ? 'on' : ''}" type="button" id="othShow" aria-pressed="${othShowMoves}">${othShowMoves ? 'On' : 'Off'}</button></div>
+    <div class="oth-wrap">
+      <div class="oth-main">
+        <div class="oth-score-row">
+          <div class="oth-score" id="othScoreB"><span class="oth-disc b"></span><b id="othCntB">2</b>Black</div>
+          <div class="oth-score" id="othScoreW"><span class="oth-disc w"></span><b id="othCntW">2</b>White</div>
+        </div>
+        <div class="oth-board" id="othBoard" role="group" aria-label="Othello board"></div>
+        <div class="oth-msg" id="othMsg" role="status" aria-live="polite"></div>
+        <div class="btn-row" style="margin-top:0;">
+          <button class="btn ghost" id="othNew">New game</button>
+          <button class="btn ghost" id="othHint">Hint</button>
+          <button class="btn ghost" id="othUndo">Undo</button>
+        </div>
+      </div>
+    </div>
+  `;
+  const bd = document.getElementById('othBoard');
+  for (let r = 0; r < OTH_N; r++) for (let c = 0; c < OTH_N; c++) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'oth-cell'; b.dataset.r = r; b.dataset.c = c;
+    bd.appendChild(b);
+  }
+  bd.addEventListener('click', e => { const t = e.target.closest('.oth-cell'); if (t) othClick(+t.dataset.r, +t.dataset.c); });
+  view.querySelectorAll('.mode-btn[data-m]').forEach(b => b.addEventListener('click', () => { othMode = b.dataset.m; safeSet('oth-mode', othMode); othB = null; renderOthello(false); }));
+  view.querySelectorAll('.mode-btn[data-l]').forEach(b => b.addEventListener('click', () => { othLevel = +b.dataset.l; safeSet('oth-level', othLevel); othB = null; renderOthello(false); }));
+  document.getElementById('othShow').addEventListener('click', () => { othShowMoves = !othShowMoves; safeSet('oth-show', othShowMoves); renderOthello(true); });
+  document.getElementById('othNew').addEventListener('click', () => { othB = null; renderOthello(false); });
+  document.getElementById('othHint').addEventListener('click', othHint);
+  document.getElementById('othUndo').addEventListener('click', othUndo);
+  othPaint(null);
+  othTurnMsg();
+  if (othOver) othEndMsg();
+  else if (!othHumanTurn()) othScheduleAi();
+}
+
+function othPaint(prev) {
+  const bd = document.getElementById('othBoard'); if (!bd) return;
+  const legal = (!othOver && othHumanTurn() && othShowMoves) ? othMoves(othB, othTurn) : [];
+  const lset = new Set(legal.map(m => m.r * 8 + m.c));
+  const cells = bd.children;
+  for (let r = 0; r < OTH_N; r++) for (let c = 0; c < OTH_N; c++) {
+    const el = cells[r * 8 + c], v = othB[r][c];
+    const isL = lset.has(r * 8 + c);
+    el.className = 'oth-cell' + (isL ? ' legal' : '') + (othLast && othLast[0] === r && othLast[1] === c ? ' last' : '');
+    let d = el.querySelector('.oth-disc');
+    if (v) {
+      if (!d) { d = document.createElement('span'); el.appendChild(d); }
+      const cls = 'oth-disc ' + (v === 1 ? 'b' : 'w');
+      const changed = prev && prev[r][c] !== v && prev[r][c] !== 0;
+      d.className = cls + (changed ? ' flip' : '');
+    } else if (d) d.remove();
+    let dot = el.querySelector('.oth-dot');
+    if (isL && !dot) { dot = document.createElement('span'); dot.className = 'oth-dot'; el.appendChild(dot); }
+    else if (!isL && dot) dot.remove();
+    el.setAttribute('aria-label', 'Row ' + (r + 1) + ', column ' + (c + 1) + ', ' + (v === 1 ? 'black disc' : v === -1 ? 'white disc' : (isL ? 'empty, legal move' : 'empty')));
+  }
+  const k = othCount(othB);
+  const set = (id, t) => { const e = document.getElementById(id); if (e) e.textContent = t; };
+  set('othCntB', k.b); set('othCntW', k.w);
+  const sb = document.getElementById('othScoreB'), sw = document.getElementById('othScoreW');
+  if (sb && sw) { sb.classList.toggle('turn', !othOver && othTurn === 1); sw.classList.toggle('turn', !othOver && othTurn === -1); }
+  const u = document.getElementById('othUndo'); if (u) u.disabled = othHist.length === 0 || othBusy;
+}
+
+function othClick(r, c) {
+  if (othOver || othBusy || !othHumanTurn()) return;
+  const f = othFlips(othB, r, c, othTurn);
+  if (!f.length) { othSetMsg('That move flips nothing — pick a square with a dot.'); return; }
+  othDo({r, c, f});
+}
+
+function othDo(mv) {
+  othHist.push({b: othCopy(othB), turn: othTurn, last: othLast});
+  const prev = othCopy(othB);
+  othApply(othB, mv, othTurn);
+  othLast = [mv.r, mv.c];
+  othTurn = -othTurn;
+  // pass handling
+  let passMsg = '';
+  if (!othMoves(othB, othTurn).length) {
+    if (othMoves(othB, -othTurn).length) { passMsg = (othMode === '1p' ? (othTurn === 1 ? 'You have no legal move — you pass.' : 'Computer has no legal move — it passes.') : (othTurn === 1 ? 'Black has no legal move — passes.' : 'White has no legal move — passes.')); othTurn = -othTurn; }
+    else othOver = true;
+  }
+  othPaint(prev);
+  if (othOver) { othFinish(); return; }
+  othTurnMsg();
+  if (passMsg) othSetMsg(passMsg);
+  if (!othHumanTurn()) othScheduleAi();
+  else if (othMode === '1p' && passMsg === '') { /* human's turn */ }
+}
+
+function othScheduleAi() {
+  othBusy = true; const tok = othToken; othPaint(null);
+  setTimeout(() => {
+    if (tok !== othToken || othOver) { othBusy = false; return; }
+    const mv = othAiPick(othB, othTurn, othLevel);
+    othBusy = false;
+    if (!mv) return;
+    othDo(mv);
+  }, 550);
+}
+
+function othEndMsg() {
+  const k = othCount(othB);
+  const hi = Math.max(k.b, k.w), lo = Math.min(k.b, k.w);
+  if (k.b === k.w) othSetMsg('Draw ' + k.b + '–' + k.w + '.');
+  else if (othMode === '1p') othSetMsg(k.b > k.w ? 'You win ' + hi + '–' + lo + '!' : 'Computer wins ' + hi + '–' + lo + '.');
+  else othSetMsg((k.b > k.w ? 'Black' : 'White') + ' wins ' + hi + '–' + lo + '.');
+}
+function othFinish() {
+  othEndMsg();
+  const k = othCount(othB);
+  if (othMode === '1p') {
+    if (k.b > k.w) { othStats.wins++; awardBadges('othello', othStats.wins); celebrateWin(document.getElementById('othBoard')); }
+    else if (k.b < k.w) othStats.losses++; else othStats.draws = (othStats.draws || 0) + 1;
+    safeSet('oth-stats', othStats);
+  }
+  othPaint(null);
+}
+
+function othHint() {
+  if (othOver || othBusy || !othHumanTurn()) return;
+  const mv = othAiPick(othB, othTurn, 4); if (!mv) return;
+  const el = document.getElementById('othBoard').children[mv.r * 8 + mv.c];
+  el.classList.add('hint'); setTimeout(() => el.classList.remove('hint'), 2200);
+  othSetMsg('Try the pulsing square.');
+}
+function othUndo() {
+  if (othBusy || !othHist.length) return;
+  othToken++; othBusy = false;
+  let s = othHist.pop();
+  // against the computer, step back to the person's own turn
+  while (othMode === '1p' && s.turn !== 1 && othHist.length) s = othHist.pop();
+  othB = s.b; othTurn = s.turn; othLast = s.last; othOver = false;
+  othPaint(null); othTurnMsg();
+  if (!othHumanTurn()) othScheduleAi();
 }
 
 function renderBlockClear(resume) {
