@@ -1,7 +1,7 @@
 {
   "name": "The Parlour — Game Table",
   "short_name": "The Parlour",
-  "description": "Twenty-eight classic table games in one app.",
+  "description": "Twenty-five classic table games in one app.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

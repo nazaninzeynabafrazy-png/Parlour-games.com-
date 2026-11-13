@@ -1,5 +1,5 @@
 // Offline cache for The Parlour. Bump VERSION when you upload a new build.
-const VERSION = 'parlour-v73';
+const VERSION = 'parlour-v75';
 const FILES = ['./', 'index.html', 'three.min.js', 'manifest.webmanifest',
   'fonts/Inter-Regular.woff2', 'fonts/Inter-SemiBold.woff2', 'fonts/Fraunces-600.woff2',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png'];

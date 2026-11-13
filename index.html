@@ -1454,7 +1454,7 @@
   .bg-point.selectable { cursor: pointer; }
   .bg-point.selected { box-shadow: inset 0 0 0 2px var(--brass-light); }
   .bg-point.highlight { box-shadow: inset 0 0 0 2px var(--brass); }
-  .bg-point-label { font-size: 9px; color: var(--cream-dim); text-align: center; width: 100%; position: relative; z-index: 1; text-shadow: 0 0 3px rgba(0,0,0,0.8); }
+  .bg-point-label { font-size: min(26px, calc(12px / var(--bgsc, 1))); font-weight: 700; color: #fff; text-align: center; width: 100%; position: relative; z-index: 1; text-shadow: 0 0 2px #000, 0 0 2px #000, 0 0 3px #000, 0 0 4px #000; }
   .bg-checker {
     width: 68%;
     aspect-ratio: 1;
@@ -1469,6 +1469,8 @@
   html.cb .bg-checker, html.cb .bg-bar-checker, html.cb .bg-tray-checker { position: relative; }
   html.cb .bg-checker.w::after, html.cb .bg-bar-checker.w::after, html.cb .bg-tray-checker.w::after { content: ''; position: absolute; inset: 24%; border-radius: 50%; border: 2.5px solid rgba(0,0,0,.65); background: transparent; }
   html.cb .bg-checker.b::after, html.cb .bg-bar-checker.b::after, html.cb .bg-tray-checker.b::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 3px, transparent 3px 7px); }
+  html.cb .ws-seg { position: relative; }
+  html.cb .ws-seg::after { content: attr(data-s); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; line-height: 1; text-shadow: 0 0 2px #000, 0 0 2px #000; }
   html.cb .ludo-token { position: relative; }
   html.cb .ludo-token::after { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 80%; text-shadow: 0 0 2px #000; }
   html.cb .ludo-token.red::after { content: '\25B2'; } html.cb .ludo-token.green::after { content: '\25A0'; } html.cb .ludo-token.blue::after { content: '\25CF'; } html.cb .ludo-token.yellow::after { content: '\2605'; }
@@ -1522,7 +1524,14 @@
   .bg-strength b { min-width: 96px; text-align: right; color: var(--brass-light); font-weight: 600; }
   .bg-table-wrap.stretch .bg-checker { width: var(--bgck); }
   .bg-corner { position: absolute; width: 64px; white-space: nowrap; text-align: center; color: var(--cream); font-size: 11px; line-height: 1.2; display: flex; flex-direction: row; gap: 3px; align-items: baseline; justify-content: center; transform: translateY(-50%); z-index: 3; pointer-events: none; }
-  .bg-corner { font-size: 10px; }
+  .bg-corner { font-size: 12px; flex-direction: column !important; gap: 0 !important; align-items: center !important; width: 56px; white-space: normal; }
+  .bg-corner b { font-size: 17px; }
+  .bg-top-row .btn-row { min-height: 46px; align-items: center; }
+  .bg-top-row { min-height: 46px; }
+  .diff-btn, .mode-btn, .bj-style-btn, .jig-tray-arrow, .opt-btn { min-height: 44px; }
+  input[type=range] { min-height: 32px; }
+  @media (max-width: 520px) { #bgFullBtn { background: var(--brass); color: var(--ink); border-color: var(--brass); } }
+  .bg-cube { min-height: 2.4em; }
   .bg-corner.c-tl, .bg-corner.c-tr { transform: translateY(-50%) rotate(180deg); }
   .bg-corner b { font-family: var(--font-display); font-size: 14px; color: var(--brass-light); }
   .bg-corner.c-tl, .bg-corner.c-bl { left: 0; } .bg-corner.c-tr, .bg-corner.c-br { right: 0; }
@@ -2216,7 +2225,7 @@
   <div class="topbar">
     <h1 id="homeLink">The Parlour</h1>
     <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
-      <div class="tagline">A table of twenty-eight games, all dealt out and ready to play.</div>
+      <div class="tagline">A table of twenty-five games, all dealt out and ready to play.</div>
     </div>
   </div>
   <div class="game-bar">
@@ -2335,7 +2344,6 @@ const GAMES = [
   {id:'chess', name:'Chess', status:'Playable + simple AI', notes:'Standard chess, plus Tamerlane Chess (Full & Simplified) and Double Chess variants', playable:true, category:'strategy',
     variants:['Standard Chess','Tamerlane Chess','Tamerlane Chess (Full)','Tamerlane Chess (Simplified)','Double Chess']},
   {id:'gemstats', name:'Gem Stats', status:'Fully playable', notes:'Your gem balance, what you earned and from where', playable:true, category:'stats'},
-  {id:'chesslessons', name:'Chess Lessons', status:'Fully playable', notes:'Your chess record across every rule set, with the lesson library underneath', playable:true, category:'strategy'},
   {id:'checkers', name:'Checkers', status:'Playable + AI', notes:'16 regional rule sets, 10 AI levels, 2-player mode, Helper, 7 themes, 2D/3D view, auto-save', playable:true, category:'strategy',
     variants:['American Checkers','English Draughts','Brazilian Checkers','Canadian Checkers','Chinese Checkers','Bashni','Czech Checkers','Dameo','Ghanaian Checkers','Damii','International Checkers','Polish Checkers','Italian Checkers','Malaysian Checkers','Singaporean Checkers','Pool Checkers','Russian Checkers','Nigerian Checkers','Nigerian Draughts','Spanish Checkers','Thai Checkers','Makhos','Turkish Checkers']},
   {id:'othello', name:'Othello', status:'Playable + AI', notes:'Classic Reversi \u2014 trap and flip your opponent\u2019s discs, 5 AI levels, 2-player mode, hint and undo', playable:true, category:'strategy'},
@@ -3571,7 +3579,7 @@ let APP_LANG = (function () { const l = safeGet('app-lang', 'en'); return (l ===
 function isRtlLang() { return APP_LANG === 'fa' || APP_LANG === 'azb'; }
 const FA = {
   // hub
-  'A table of twenty-eight games, all dealt out and ready to play.': 'میزی با بیست‌وهشت بازی، چیده و آمادهٔ بازی.',
+  'A table of twenty-five games, all dealt out and ready to play.': 'میزی با بیست‌وپنج بازی، چیده و آمادهٔ بازی.',
   'Search games...': 'جستجوی بازی‌ها...',
   'Your scores live only in this browser, on this device.': 'امتیازهای شما فقط در همین مرورگر و روی همین دستگاه ذخیره می‌شوند.',
   '← Back to the table': '→ بازگشت به میز',
@@ -4747,6 +4755,28 @@ const FA = {
   "white disc": "مهرهٔ سفید",
   "empty, legal move": "خالی، حرکت مجاز",
   "Classic Reversi — trap and flip your opponent’s discs, 5 AI levels, 2-player mode, hint and undo": "ریورسی کلاسیک — مهره‌های حریف را محاصره و برگردانید، ٥ سطح رایانه، حالت دونفره، راهنما و برگشت",
+  "Control the centre early with pawns and develop your knights and bishops before moving the queen.": "زود مرکز را با پیاده‌ها کنترل کنید و پیش از حرکت وزیر، اسب‌ها و فیل‌ها را به بازی بیاورید.",
+  "Castle early to tuck your king away and bring a rook into play.": "زود قلعه کنید تا شاه امن شود و رخ وارد بازی شود.",
+  "Before every move, ask what your opponent’s last move threatens.": "پیش از هر حرکت بپرسید حرکت قبلی حریف چه تهدیدی دارد.",
+  "Use the Hint button during a game, then the post-game Review, to learn from your mistakes.": "در بازی از دکمهٔ اشاره و پس از بازی از مرور استفاده کنید تا از اشتباه‌هایتان یاد بگیرید.",
+  "Keep your back row intact as long as you can — it stops your opponent from getting kings.": "تا می‌توانید ردیف عقب را نگه دارید؛ جلوی شاه شدن مهرهٔ حریف را می‌گیرد.",
+  "Trade pieces when you are ahead; avoid trades when you are behind.": "وقتی جلو هستید مهره تعویض کنید؛ وقتی عقب هستید از تعویض بپرهیزید.",
+  "Look for forced captures: you can set up a sacrifice that forces your opponent into a bigger loss.": "گرفتن‌های اجباری را ببینید: با یک قربانی می‌توانید حریف را به ضرر بزرگ‌تری وادار کنید.",
+  "The Helper button shows the moves available to you.": "دکمهٔ «کمک» حرکت‌های ممکن شما را نشان می‌دهد.",
+  "Save your Wild cards for when you are stuck, not as your first play.": "کارت‌های وایلد را برای وقتی نگه دارید که گیر کرده‌اید، نه برای اولین حرکت.",
+  "Change the colour to one you hold many of.": "رنگ را به رنگی تغییر دهید که کارت‌های بیشتری از آن دارید.",
+  "Watch what colours the computers keep skipping — they are probably out of them.": "ببینید رایانه‌ها کدام رنگ را مدام رد می‌کنند؛ احتمالاً آن رنگ را ندارند.",
+  "Play your Draw Two or Skip just before a computer opponent goes out.": "کارت «دو بردار» یا «رد شو» را درست پیش از تمام شدن کارت‌های رقیب بازی کنید.",
+  "Start with the numbers that appear most often on the grid; each one narrows the rest.": "از عددهایی شروع کنید که بیشتر در جدول آمده‌اند؛ هر کدام بقیه را محدودتر می‌کند.",
+  "Scan rows, columns and boxes for a cell that has only one possible digit.": "ردیف‌ها، ستون‌ها و خانه‌های بزرگ را بگردید تا خانه‌ای بیابید که فقط یک رقم ممکن دارد.",
+  "Use the Hint button to reveal one correct cell if you are stuck.": "اگر گیر کردید، با دکمهٔ اشاره یک خانهٔ درست را ببینید.",
+  "If you guess wrong, use Check to see which cells are mistakes.": "اگر حدس‌تان غلط بود، با «بررسی» خانه‌های اشتباه را ببینید.",
+  "Properties in the same colour group make rent far more valuable — aim to complete a set.": "ملک‌های هم‌رنگ اجاره را بسیار بیشتر می‌کنند؛ سعی کنید یک مجموعه را کامل کنید.",
+  "Do not spend all your cash early; keep some for rent and taxes.": "همهٔ پول را زود خرج نکنید؛ کمی برای اجاره و مالیات نگه دارید.",
+  "Orange and red properties are landed on most often after Jail.": "ملک‌های نارنجی و قرمز بعد از زندان بیشتر از همه مورد استفاده قرار می‌گیرند.",
+  "Mortgage properties only as a last resort.": "ملک را فقط به عنوان آخرین راه رهن بگذارید.",
+  "Lessons & record": "آموزش و سوابق",
+  "← Back to Chess": "→ بازگشت به شطرنج",
   "Lakeside Cottage": "کلبهٔ کنار دریاچه",
   "Sunburst & Suits": "پرتو خورشید و خال‌ها",
   "Card Fan": "بادبزن کارت",
@@ -4870,7 +4900,7 @@ const FA_NOTES = {
 };
 // Iranian Azerbaijani (South Azerbaijani, Perso-Arabic script) -- first draft, to be proofread by a native speaker.
 const AZB = {
-  'A table of twenty-eight games, all dealt out and ready to play.': 'یئگیرمی‌سکگیز اویونلا دولو بیر ماسا، حاضیر و اوینامایا آماده.',
+  'A table of twenty-five games, all dealt out and ready to play.': 'یئگیرمی‌بئش اویونلا دولو بیر ماسا، حاضیر و اوینامایا آماده.',
   'Search games...': 'اویونلاری آختار...',
   'Your scores live only in this browser, on this device.': 'نتیجه‌لریز یالنیز بو بروزرده و بو دستگاهدا ساخلانیر.',
   '← Back to the table': '→ ماسایا قاییت',
@@ -4925,6 +4955,8 @@ const LANG_NOTES = { fa: FA_NOTES, azb: AZB_NOTES };
 // Persian: text that contains numbers or names that change (so it cannot be a fixed dictionary entry)
 const pd = (x) => String(x).replace(/\d/g, c => '\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669'[c]);   // Arabic-Indic digits are used in Persian and Azerbaijani
 const FA_PATTERNS = [
+  [/^Hint: with (a soft )?(\d+) against the dealer\u2019s (Ace|\d+), (hitting|standing) is the usual play\.$/, (m, pd) => 'اشاره: با ' + (m[1] ? 'دست نرم ' : '') + pd(m[2]) + ' در برابر ' + (m[3] === 'Ace' ? 'آس' : pd(m[3])) + ' دیلر، معمولاً ' + (m[4] === 'hitting' ? 'کارت گرفتن' : 'ایستادن') + ' بهتر است.'],
+  [/^Hint: move a checker from (the bar|point (\d+)) to (off the board|point (\d+))\.$/, (m, pd) => 'اشاره: یک مهره را از ' + (m[2] ? 'خانهٔ ' + pd(m[2]) : 'نوار') + ' به ' + (m[4] ? 'خانهٔ ' + pd(m[4]) : 'بیرون از تخته') + ' ببرید.'],
   // ---- full-app Persian: dynamic lines ----
   [/^Stage (\d+) · (.+?)((?:Vertical|Horizontal|Square) · .+)$/, (m, pd) => 'مرحله ' + pd(m[1]) + ' · ' + tr(m[2]) + ' ' + tr(m[3])],
   [/^Stage (\d+) · (.+)$/, (m, pd) => 'مرحله ' + pd(m[1]) + ' · ' + tr(m[2])],
@@ -5038,6 +5070,8 @@ const FA_PATTERNS = [
     const cl = c => { let x; if ((x = /^capture the (.+)$/.exec(c))) return pn(x[1]) + ' را بگیرید'; if (/^castle/.test(c)) return 'قلعه‌گیری کنید تا شاه امن شود'; if (/^promote/.test(c)) return 'پیاده را ارتقا دهید'; if (/^check the opponent/.test(c)) return 'شاه حریف را کیش کنید'; if (/^move toward the center/.test(c)) return 'به‌سمت مرکز بروید تا گزینه‌های بیشتری داشته باشید'; if (/^reposition|^improve/.test(c)) return 'به خانه‌ای فعال‌تر بروید'; return c; };
     return 'سعی کنید ' + pn(m[1]) + ' خود را از ' + m[2] + ' به ' + m[3] + ' ببرید — با این کار می‌توانید ' + m[4].split(', and ').map(cl).join(' و ') + '.'; }],
   [/^(You win|Computer wins|Black wins|White wins|Draw) (\d+)[–-](\d+)([!.])$/, (m, pd) => ({ 'You win': 'شما بردید', 'Computer wins': 'رایانه برد', 'Black wins': 'سیاه برد', 'White wins': 'سفید برد', 'Draw': 'مساوی' })[m[1]] + ' ' + pd(m[2]) + '–' + pd(m[3]) + (m[4] === '!' ? '!' : '.')],
+  // ---- end dynamic ----
+  // ---- end dynamic ----
   // ---- end dynamic ----
   // ---- end dynamic ----
   // ---- end dynamic ----
@@ -5997,6 +6031,7 @@ function bjShowHandScreen() {
       <div class="bj-status" id="bjStatus"></div>
       <div class="btn-row">
         <button class="btn" id="hitBtn">Hit</button>
+        <button class="btn ghost" id="bjHintBtn">Hint</button>
         <button class="btn ghost" id="standBtn">Stand</button>
         <button class="btn ghost" id="newBtn">New bet</button>
       </div>
@@ -6009,6 +6044,7 @@ function bjShowHandScreen() {
     </div>
   `;
   document.getElementById('hitBtn').addEventListener('click', bjHit);
+  document.getElementById('bjHintBtn').addEventListener('click', bjHint);
   document.getElementById('standBtn').addEventListener('click', bjStand);
   document.getElementById('newBtn').addEventListener('click', () => renderBlackjack());
   bjWireStylePicker();
@@ -6079,6 +6115,20 @@ function bjHit() {
 }
 
 function bjStand() { bjFinish(); }
+
+// Basic-strategy hint (hit or stand only): what a careful player would do with this hand against the dealer's up-card.
+function bjHint() {
+  if (!bjState || bjState.over) return;
+  const hand = bjState.player, v = handValue(hand), up = cardValue(bjState.dealer[0].rank);
+  let raw = hand.reduce((a, c) => a + cardValue(c.rank), 0), aces = hand.filter(c => c.rank === 'A').length;
+  while (raw > 21 && aces > 0) { raw -= 10; aces--; }
+  const soft = aces > 0;
+  let hit;
+  if (soft) hit = v <= 17 || (v === 18 && up >= 9);
+  else hit = v <= 11 ? true : v === 12 ? !(up >= 4 && up <= 6) : v <= 16 ? up >= 7 : false;
+  const el = document.getElementById('bjStatus');
+  if (el) el.textContent = 'Hint: with ' + (soft ? 'a soft ' : '') + v + ' against the dealer\u2019s ' + (up === 11 ? 'Ace' : up) + ', ' + (hit ? 'hitting' : 'standing') + ' is the usual play.';
+}
 
 function bjFinish(playerBusted) {
   bjState.over = true;
@@ -6293,6 +6343,12 @@ function suMetaRenderSetup() {
   view.innerHTML = `
     <h2 class="game-title">Sudoku</h2>
     <p class="game-sub">Pick a variant to play.</p>
+    ${coachBlock([
+      "Start with the numbers that appear most often on the grid; each one narrows the rest.",
+      "Scan rows, columns and boxes for a cell that has only one possible digit.",
+      "Use the Hint button to reveal one correct cell if you are stuck.",
+      "If you guess wrong, use Check to see which cells are mistakes."
+    ])}
     ${aboutBlock(`
       <p>Four variants are available:</p>
       <ul>
@@ -8333,6 +8389,12 @@ function ckRenderSetup() {
   view.innerHTML = `
     <h2 class="game-title">Checkers</h2>
     <p class="game-sub">Choose a rule set, difficulty, and look before the board is set up.</p>
+    ${coachBlock([
+      "Keep your back row intact as long as you can \u2014 it stops your opponent from getting kings.",
+      "Trade pieces when you are ahead; avoid trades when you are behind.",
+      "Look for forced captures: you can set up a sacrifice that forces your opponent into a bigger loss.",
+      "The Helper button shows the moves available to you."
+    ])}
     ${aboutBlock(`
       <p>One configurable board supports many regional rule sets. The big differences between them:</p>
       <ul>
@@ -11486,6 +11548,12 @@ function chRenderSetup() {
   view.innerHTML = `
     <h2 class="game-title">Chess</h2>
     <p class="game-sub">Pick a rule set, then a difficulty rating for the computer.</p>
+    ${coachBlock([
+      "Control the centre early with pawns and develop your knights and bishops before moving the queen.",
+      "Castle early to tuck your king away and bring a rook into play.",
+      "Before every move, ask what your opponent\u2019s last move threatens.",
+      "Use the Hint button during a game, then the post-game Review, to learn from your mistakes."
+    ])}
     ${aboutBlock(`
       <p>Nine rule sets are available:</p>
       <ul>
@@ -11510,8 +11578,12 @@ function chRenderSetup() {
         <input type="range" id="chEloSlider" min="0" max="3100" step="50" value="${chEloRating}">
       </div>
     </div>
-    <button class="btn" id="chStartBtn" style="margin-top:14px;">Start</button>
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="btn" id="chStartBtn">Start</button>
+      <button class="btn ghost" id="chLessonsBtn">Lessons &amp; record</button>
+    </div>
   `;
+  document.getElementById('chLessonsBtn').addEventListener('click', renderChessLessons);
   const variantRow = document.getElementById('chVariantRow');
   CHESS_VARIANT_ORDER.forEach(id => {
     const v = CHESS_VARIANTS[id];
@@ -13392,6 +13464,7 @@ function renderChessLessons() {
   const played = tot.wins + tot.losses + tot.draws;
   const pct = (r) => { const n = r.wins + r.losses + r.draws; return n ? Math.round(r.wins * 100 / n) + '%' : '\u2014'; };
   view.innerHTML = `
+    <div class="btn-row" style="margin-top:0;"><button class="btn ghost" id="lessonsToChess">\u2190 Back to Chess</button></div>
     <h2 class="game-title">Chess Lessons</h2>
     <p class="game-sub">Your chess record across every rule set, kept on this device, and the lesson library. In-game Hints and the post-game Review live on the Chess board.</p>
     <div class="bj-stats" style="margin:14px 0;">
@@ -13404,6 +13477,7 @@ function renderChessLessons() {
     <h3 class="hub-section-title" style="margin-top:6px;">Lessons</h3>
     <div class="lesson-grid" id="lessonGrid"></div>
   `;
+  document.getElementById('lessonsToChess').addEventListener('click', chRenderSetup);
   renderLessonGrid();
 }
 
@@ -14355,6 +14429,7 @@ function bgApplyRotation() {
     const yt = ys(bt), yb = ys(bb);
     place('.c-tl', yt); place('.c-tr', yt); place('.c-bl', yb); place('.c-br', yb); }
   wrap.style.cssText = 'position:absolute;left:50%;top:50%;width:' + w + 'px;transform:translate(-50%,-50%) rotate(90deg) scale(' + sc + ');'; if (ckv) wrap.style.setProperty('--bgck', ckv);
+  wrap.style.setProperty('--bgsc', sc.toFixed(3));
 }
 let bgScrollKeep = null;
 function bgRenderBoard() {
@@ -14401,6 +14476,7 @@ function bgRenderBoard() {
       <div class="btn-row" style="margin-top:0;">
         ${canHumanDouble ? '<button class="btn ghost" id="bgDoubleBtn">Double</button>' : ''}
         ${bgAwaitingResponse && bgPendingDoubler === 'b' ? '<button class="btn" id="bgAcceptBtn">Accept</button><button class="btn ghost" id="bgResignBtn">Resign</button>' : ''}
+        ${(bgTurn === 'w' && bgDice.length > 0 && !bgOver && !bgAwaitingResponse) ? '<button class="btn ghost" id="bgHintBtn">Hint</button>' : ''}
         <button class="btn ghost" id="bgFullBtn">Full screen</button>
         <button class="btn ghost" id="bgNew">New game</button>
       </div>
@@ -14446,6 +14522,11 @@ function bgRenderBoard() {
   strEl.addEventListener('input', () => { bgAiStrength = Number(strEl.value); safeSet('bg-ai-strength', bgAiStrength); const v = document.getElementById('bgStrVal'); if (v) v.textContent = bgAiStrength + ' \u00b7 ' + BG_STRENGTH_NAMES[bgAiStrength]; strEl.setAttribute('aria-valuetext', bgAiStrength + ', ' + BG_STRENGTH_NAMES[bgAiStrength]); });
   const bgSetFull = (on) => { bgFull = on; try { if (on && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{}); else if (!on && document.fullscreenElement) document.exitFullscreen().catch(()=>{}); } catch (e) {} bgApplyRotation(); };
   document.getElementById('bgFullBtn').addEventListener('click', () => bgSetFull(true));
+  { const hb = document.getElementById('bgHintBtn'); if (hb) hb.addEventListener('click', () => {
+      const mv = bgRestrictedLegalMoves('w', bgDice); if (!mv.length) return;
+      let best = mv[0], bs = -Infinity; mv.forEach(m => { const v = bgAiScoreMove('w', m); if (v > bs) { bs = v; best = m; } });
+      const nm = (x) => x === 'bar' ? 'the bar' : x === 'off' ? 'off the board' : 'point ' + (x + 1);
+      const st = document.getElementById('bgStatus'); if (st) st.textContent = 'Hint: move a checker from ' + nm(best.from) + ' to ' + nm(best.to) + '.'; }); } 
   document.getElementById('bgFullX').addEventListener('click', () => bgSetFull(false));
   if (!window.__bgFsWatch) { window.__bgFsWatch = true; document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && bgFull && document.querySelector('.bg-rot-box')) { bgFull = false; bgApplyRotation(); } }); }
   if (canHumanDouble) document.getElementById('bgDoubleBtn').addEventListener('click', bgHumanOffersDouble);
@@ -18620,7 +18701,7 @@ function wsRender() {
   rack.innerHTML = wsBottles.map((b, i) => {
     const done = b.length === WS_CAP && wsUniform(b);
     const cls = 'ws-bottle' + (wsSel === i ? ' sel' : '') + (done ? ' done' : '') + (wsFlip[i] ? ' flip' : '') + (wsHint && (wsHint[0] === i || wsHint[1] === i) ? ' hint' : '');
-    const segs = b.map(c => `<i class="ws-seg" style="background:${WS_COLORS[c].hex}"></i>`).join('');
+    const segs = b.map(c => `<i class="ws-seg" data-s="${'\u25CF\u25B2\u25A0\u25C6\u2605\u271A\u2665\u263E\u2716\u2B1F\u273F'[c]}" style="background:${WS_COLORS[c].hex}"></i>`).join('');
     return `<button class="${cls}" id="wsB${i}" aria-label="${wsAria(b, i)}"><span class="ws-lip"></span><span class="ws-glass">${segs}</span></button>`;
   }).join('');
   wsBottles.forEach((b, i) => { const el = document.getElementById('wsB' + i); if (el) el.addEventListener('click', () => wsTap(i)); });
@@ -19581,6 +19662,12 @@ function unRenderSetup() {
   view.innerHTML = `
     <h2 class="game-title">Uno</h2>
     <p class="game-sub">Pick how many computer opponents you want, then deal.</p>
+    ${coachBlock([
+      "Save your Wild cards for when you are stuck, not as your first play.",
+      "Change the colour to one you hold many of.",
+      "Watch what colours the computers keep skipping \u2014 they are probably out of them.",
+      "Play your Draw Two or Skip just before a computer opponent goes out."
+    ])}
     ${aboutBlock(`
       <ul>
         <li>Match the top card's color, number, or symbol — or play a Wild card any time.</li>
@@ -20205,6 +20292,12 @@ function mpRenderSetup() {
   view.innerHTML = `
     <h2 class="game-title">Monopoly</h2>
     <p class="game-sub">Pick a rule set and how many computer opponents you want.</p>
+    ${coachBlock([
+      "Properties in the same colour group make rent far more valuable \u2014 aim to complete a set.",
+      "Do not spend all your cash early; keep some for rent and taxes.",
+      "Orange and red properties are landed on most often after Jail.",
+      "Mortgage properties only as a last resort."
+    ])}
     ${aboutBlock(`
       <ul>
         <li><b>Classic</b> — full rules: auctions when a purchase is declined, mortgaging, the even-build rule for houses, and the full 3-option jail (pay $50, use a card, or try for doubles).</li>
